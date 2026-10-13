@@ -19,7 +19,11 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: LauncherViewModel by viewModels {
         val app = application as NeuroMinimalApplication
-        LauncherViewModel.Factory(app.appRepository, app.preferences)
+        LauncherViewModel.Factory(
+            appRepository = app.appRepository,
+            preferences = app.preferences,
+            archiveDao = app.database.dailyArchiveDao()
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,5 +44,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.checkDailyRollover()
     }
 }

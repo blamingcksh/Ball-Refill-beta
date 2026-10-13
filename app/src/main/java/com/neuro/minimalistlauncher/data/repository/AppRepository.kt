@@ -33,15 +33,18 @@ class AppRepository(
     val apps: StateFlow<List<AppItem>> = combine(
         _rawApps,
         preferences.pinnedPackages,
-        preferences.frictionTaggedPackages
-    ) { rawList, pinnedSet, frictionSet ->
+        preferences.frictionDurations
+    ) { rawList, pinnedSet, frictionMap ->
         rawList.map { raw ->
+            val duration = frictionMap[raw.packageName]
+            val isTagged = duration != null && duration > 0
             AppItem(
                 packageName = raw.packageName,
                 activityName = raw.activityName,
                 label = raw.label,
                 isPinned = pinnedSet.contains(raw.packageName),
-                isFrictionTagged = frictionSet.contains(raw.packageName)
+                isFrictionTagged = isTagged,
+                frictionDurationSeconds = duration ?: 5
             )
         }.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.label })
     }.stateIn(

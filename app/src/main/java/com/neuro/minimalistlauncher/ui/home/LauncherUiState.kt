@@ -1,6 +1,8 @@
 package com.neuro.minimalistlauncher.ui.home
 
+import com.neuro.minimalistlauncher.data.db.entity.DailyArchiveWithTasks
 import com.neuro.minimalistlauncher.data.model.AppItem
+import com.neuro.minimalistlauncher.data.model.DailyTask
 
 data class LauncherUiState(
     val allApps: List<AppItem> = emptyList(),
@@ -9,6 +11,9 @@ data class LauncherUiState(
     val searchQuery: String = "",
     val mathResult: String? = null,
     val scratchpadText: String = "",
+    val activeTasks: List<DailyTask> = emptyList(),
+    val archives: List<DailyArchiveWithTasks> = emptyList(),
+    val isHistoryOpen: Boolean = false,
     val interceptedApp: AppItem? = null,
     val appOptionsTarget: AppItem? = null
 )

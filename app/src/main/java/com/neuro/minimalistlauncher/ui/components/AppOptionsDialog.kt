@@ -1,10 +1,13 @@
 package com.neuro.minimalistlauncher.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -24,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.neuro.minimalistlauncher.data.model.AppItem
 import com.neuro.minimalistlauncher.ui.theme.CharcoalElevated
+import com.neuro.minimalistlauncher.ui.theme.CharcoalSurface
+import com.neuro.minimalistlauncher.ui.theme.DimHighlight
 import com.neuro.minimalistlauncher.ui.theme.PrimaryOffWhite
 import com.neuro.minimalistlauncher.ui.theme.SecondaryMutedAsh
 import com.neuro.minimalistlauncher.ui.theme.SubtleBorder
@@ -36,7 +41,7 @@ fun AppOptionsDialog(
     app: AppItem,
     onDismiss: () -> Unit,
     onTogglePin: (AppItem) -> Unit,
-    onToggleFriction: (AppItem) -> Unit
+    onSetFrictionDuration: (AppItem, Int?) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -72,16 +77,87 @@ fun AppOptionsDialog(
                 }
             )
 
-            // Friction tag option
-            DialogOptionRow(
-                title = if (app.isFrictionTagged) "Remove Intentional Friction" else "Enable Intentional Friction",
-                subtitle = if (app.isFrictionTagged) "Open instantly without 5s pause" else "Add 5-second breath pause before opening",
-                onClick = {
-                    HapticsHelper.performLightTick(context)
-                    onToggleFriction(app)
-                    onDismiss()
+            HorizontalDivider(color = SubtleBorder, thickness = 1.dp)
+
+            // Friction Section Header
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, bottom = 4.dp)
+            ) {
+                Text(
+                    text = "INTENTIONAL FRICTION",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 1.2.sp,
+                    color = SecondaryMutedAsh
+                )
+                Text(
+                    text = if (app.isFrictionTagged) {
+                        "Active: ${app.frictionDurationSeconds}s conscious pause before opening"
+                    } else {
+                        "Add a conscious breath pause before opening"
+                    },
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = SecondaryMutedAsh,
+                    modifier = Modifier.padding(top = 2.dp, bottom = 8.dp)
+                )
+
+                // Clean duration selection [5s, 10s, 15s]
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    val durations = listOf(5, 10, 15)
+                    for (duration in durations) {
+                        val isSelected = app.isFrictionTagged && app.frictionDurationSeconds == duration
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .heightIn(min = 48.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(if (isSelected) DimHighlight else CharcoalSurface)
+                                .border(
+                                    width = 1.dp,
+                                    color = if (isSelected) PrimaryOffWhite else SubtleBorder,
+                                    shape = RoundedCornerShape(6.dp)
+                                )
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
+                                ) {
+                                    HapticsHelper.performLightTick(context)
+                                    onSetFrictionDuration(app, duration)
+                                    onDismiss()
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "${duration}s",
+                                fontSize = 14.sp,
+                                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                                color = if (isSelected) PrimaryOffWhite else SecondaryMutedAsh
+                            )
+                        }
+                    }
                 }
-            )
+            }
+
+            // Remove friction option (if friction is active)
+            if (app.isFrictionTagged) {
+                DialogOptionRow(
+                    title = "Remove Intentional Friction",
+                    subtitle = "Open instantly without delay",
+                    onClick = {
+                        HapticsHelper.performLightTick(context)
+                        onSetFrictionDuration(app, null)
+                        onDismiss()
+                    }
+                )
+            }
+
+            HorizontalDivider(color = SubtleBorder, thickness = 1.dp)
 
             // System App Info
             DialogOptionRow(

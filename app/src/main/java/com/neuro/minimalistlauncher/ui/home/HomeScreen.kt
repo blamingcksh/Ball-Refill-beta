@@ -49,6 +49,7 @@ import com.neuro.minimalistlauncher.ui.components.AppOptionsDialog
 import com.neuro.minimalistlauncher.ui.components.ClockHeader
 import com.neuro.minimalistlauncher.ui.components.PinnedAppsSection
 import com.neuro.minimalistlauncher.ui.friction.FrictionInterceptorScreen
+import com.neuro.minimalistlauncher.ui.history.HistoryScreen
 import com.neuro.minimalistlauncher.ui.scratchpad.ScratchpadScreen
 import com.neuro.minimalistlauncher.ui.theme.CharcoalElevated
 import com.neuro.minimalistlauncher.ui.theme.CharcoalSurface
@@ -71,8 +72,10 @@ fun HomeScreen(
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { 2 })
 
     // Back button handling
-    BackHandler(enabled = pagerState.currentPage == 0 || uiState.searchQuery.isNotEmpty()) {
-        if (uiState.searchQuery.isNotEmpty()) {
+    BackHandler(enabled = pagerState.currentPage == 0 || uiState.searchQuery.isNotEmpty() || uiState.isHistoryOpen) {
+        if (uiState.isHistoryOpen) {
+            viewModel.closeHistory()
+        } else if (uiState.searchQuery.isNotEmpty()) {
             viewModel.clearSearchQuery()
         } else if (pagerState.currentPage == 0) {
             coroutineScope.launch {
@@ -92,10 +95,23 @@ fun HomeScreen(
         ) { page ->
             when (page) {
                 0 -> {
-                    ScratchpadScreen(
-                        text = uiState.scratchpadText,
-                        onTextChange = viewModel::onScratchpadTextChange
-                    )
+                    if (uiState.isHistoryOpen) {
+                        HistoryScreen(
+                            archives = uiState.archives,
+                            onBack = viewModel::closeHistory
+                        )
+                    } else {
+                        ScratchpadScreen(
+                            notesText = uiState.scratchpadText,
+                            onNotesTextChange = viewModel::onScratchpadTextChange,
+                            tasks = uiState.activeTasks,
+                            onAddTask = viewModel::onAddTask,
+                            onToggleTask = viewModel::onToggleTask,
+                            onDeleteTask = viewModel::onDeleteTask,
+                            onClearAll = viewModel::onClearScratchpad,
+                            onOpenHistory = viewModel::openHistory
+                        )
+                    }
                 }
                 1 -> {
                     MainLauncherContent(
@@ -123,7 +139,7 @@ fun HomeScreen(
                 app = uiState.appOptionsTarget,
                 onDismiss = viewModel::dismissAppOptions,
                 onTogglePin = viewModel::togglePin,
-                onToggleFriction = viewModel::toggleFrictionTag
+                onSetFrictionDuration = viewModel::setFrictionDuration
             )
         }
     }

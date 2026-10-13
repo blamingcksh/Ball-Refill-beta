@@ -45,11 +45,12 @@ fun FrictionInterceptorScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    var secondsRemaining by remember { mutableIntStateOf(5) }
+    val totalDelay = if (app.frictionDurationSeconds > 0) app.frictionDurationSeconds else 5
+    var secondsRemaining by remember(app.packageName, totalDelay) { mutableIntStateOf(totalDelay) }
 
-    // Non-skippable 5-second countdown
-    LaunchedEffect(app.packageName) {
-        secondsRemaining = 5
+    // Dynamic non-skippable countdown starting at the configured duration
+    LaunchedEffect(app.packageName, totalDelay) {
+        secondsRemaining = totalDelay
         while (secondsRemaining > 0) {
             delay(1000L)
             secondsRemaining -= 1
