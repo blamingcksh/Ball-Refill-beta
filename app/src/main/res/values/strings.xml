@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Minimal Launcher</string>
+    <string name="search_hint">Search apps or enter math (e.g. 12 * 8)…</string>
+    <string name="scratchpad_hint">Tap here to write notes, tasks, or thoughts…</string>
+    <string name="pinned_essentials">Pinned</string>
+    <string name="all_apps">All Applications</string>
+    <string name="distracting_tag">Distracting</string>
+    <string name="unpin_action">Unpin from top</string>
+    <string name="pin_action">Pin to top</string>
+    <string name="tag_distracting">Tag as Distracting</string>
+    <string name="untag_distracting">Remove Distracting tag</string>
+    <string name="app_info">Application Info</string>
+    <string name="cancel">Cancel</string>
+    <string name="continue_launch">Continue</string>
+    <string name="friction_prompt">Take a breath.\nDo you need to open this right now?</string>
+    <string name="scratchpad_title">Scratchpad</string>
+    <string name="clear_scratchpad">Clear</string>
+</resources>
