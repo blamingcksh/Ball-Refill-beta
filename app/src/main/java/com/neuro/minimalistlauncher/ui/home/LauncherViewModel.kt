@@ -31,6 +31,8 @@ class LauncherViewModel(
     private val _interceptedApp = MutableStateFlow<AppItem?>(null)
     private val _appOptionsTarget = MutableStateFlow<AppItem?>(null)
     private val _isHistoryOpen = MutableStateFlow(false)
+    private val _isAppDrawerOpen = MutableStateFlow(false)
+    private val _autoFocusSearch = MutableStateFlow(true)
 
     init {
         checkDailyRollover()
@@ -40,7 +42,9 @@ class LauncherViewModel(
         val apps: List<AppItem>,
         val query: String,
         val intercepted: AppItem?,
-        val optionsTarget: AppItem?
+        val optionsTarget: AppItem?,
+        val isAppDrawerOpen: Boolean,
+        val autoFocusSearch: Boolean
     )
 
     private data class ScratchpadState(
@@ -54,9 +58,19 @@ class LauncherViewModel(
         appRepository.apps,
         _searchQuery,
         _interceptedApp,
-        _appOptionsTarget
-    ) { apps, query, intercepted, optionsTarget ->
-        LauncherMainState(apps, query, intercepted, optionsTarget)
+        _appOptionsTarget,
+        _isAppDrawerOpen,
+        _autoFocusSearch
+    ) { args: Array<Any?> ->
+        @Suppress("UNCHECKED_CAST")
+        LauncherMainState(
+            apps = args[0] as List<AppItem>,
+            query = args[1] as String,
+            intercepted = args[2] as AppItem?,
+            optionsTarget = args[3] as AppItem?,
+            isAppDrawerOpen = args[4] as Boolean,
+            autoFocusSearch = args[5] as Boolean
+        )
     }
 
     private val scratchpadFlow = combine(
@@ -81,7 +95,7 @@ class LauncherViewModel(
             main.apps.filter { it.label.contains(trimmedQuery, ignoreCase = true) }
         }
 
-        val pinned = main.apps.filter { it.isPinned }.take(4)
+        val pinned = main.apps.filter { it.isPinned }.take(6)
 
         LauncherUiState(
             allApps = main.apps,
@@ -94,7 +108,9 @@ class LauncherViewModel(
             archives = scratch.archives,
             isHistoryOpen = scratch.isHistoryOpen,
             interceptedApp = main.intercepted,
-            appOptionsTarget = main.optionsTarget
+            appOptionsTarget = main.optionsTarget,
+            isAppDrawerOpen = main.isAppDrawerOpen,
+            autoFocusSearchOnDrawerOpen = main.autoFocusSearch
         )
     }.stateIn(
         scope = viewModelScope,
@@ -110,16 +126,36 @@ class LauncherViewModel(
         _searchQuery.value = ""
     }
 
+    fun openAppDrawer(autoFocus: Boolean = true) {
+        _autoFocusSearch.value = autoFocus
+        _isAppDrawerOpen.value = true
+    }
+
+    fun closeAppDrawer() {
+        _isAppDrawerOpen.value = false
+        _searchQuery.value = ""
+    }
+
+    fun toggleAppDrawer(autoFocus: Boolean = true) {
+        if (_isAppDrawerOpen.value) {
+            closeAppDrawer()
+        } else {
+            openAppDrawer(autoFocus)
+        }
+    }
+
     fun onAppClick(context: Context, app: AppItem) {
         if (app.isFrictionTagged) {
             _interceptedApp.value = app
         } else {
+            closeAppDrawer()
             launchAppDirectly(context, app)
         }
     }
 
     fun proceedWithFrictionLaunch(context: Context, app: AppItem) {
         _interceptedApp.value = null
+        closeAppDrawer()
         launchAppDirectly(context, app)
     }
 

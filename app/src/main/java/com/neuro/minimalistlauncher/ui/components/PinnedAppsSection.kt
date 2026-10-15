@@ -50,7 +50,7 @@ fun PinnedAppsSection(
 
         if (pinnedApps.isEmpty()) {
             Text(
-                text = "Long press any app below to pin here (up to 4)",
+                text = "Long press any app in drawer to pin here (up to 6)",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Normal,
                 color = SecondaryMutedAsh,
@@ -60,7 +60,7 @@ fun PinnedAppsSection(
             Column(
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                pinnedApps.take(4).forEach { app ->
+                pinnedApps.take(6).forEach { app ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

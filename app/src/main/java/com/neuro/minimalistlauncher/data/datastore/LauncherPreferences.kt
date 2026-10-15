@@ -124,7 +124,7 @@ class LauncherPreferences(private val context: Context) {
                 preferences[PreferencesKeys.PINNED_APPS] = current - packageName
                 isNowPinned = false
             } else {
-                if (current.size < 4) {
+                if (current.size < 6) {
                     preferences[PreferencesKeys.PINNED_APPS] = current + packageName
                     isNowPinned = true
                 } else {
@@ -139,7 +139,7 @@ class LauncherPreferences(private val context: Context) {
         context.dataStore.edit { preferences ->
             val current = preferences[PreferencesKeys.PINNED_APPS] ?: emptySet()
             if (pin) {
-                if (current.size < 4) {
+                if (current.size < 6) {
                     preferences[PreferencesKeys.PINNED_APPS] = current + packageName
                 }
             } else {

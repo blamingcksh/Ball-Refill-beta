@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,7 @@ fun AppListItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .alpha(if (app.isFrictionTagged) 0.35f else 1.0f)
             .heightIn(min = 52.dp)
             .combinedClickable(
                 interactionSource = remember { MutableInteractionSource() },

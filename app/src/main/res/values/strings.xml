@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Minimal Launcher</string>
+    <string name="app_name">Balls Refill</string>
     <string name="search_hint">Search apps or enter math (e.g. 12 * 8)…</string>
     <string name="scratchpad_hint">Tap here to write notes, tasks, or thoughts…</string>
     <string name="pinned_essentials">Pinned</string>

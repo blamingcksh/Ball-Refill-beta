@@ -15,5 +15,7 @@ data class LauncherUiState(
     val archives: List<DailyArchiveWithTasks> = emptyList(),
     val isHistoryOpen: Boolean = false,
     val interceptedApp: AppItem? = null,
-    val appOptionsTarget: AppItem? = null
+    val appOptionsTarget: AppItem? = null,
+    val isAppDrawerOpen: Boolean = false,
+    val autoFocusSearchOnDrawerOpen: Boolean = true
 )
